@@ -7,25 +7,32 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
-      lowercase: true
+      lowercase: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
     },
     hashedPassword: {
       type: String,
-      required: true
+      required: true,
     },
     role: {
       type: String,
       enum: ["Employee", "IT Staff", "Admin"],
-      default: "Employee"
+      default: "Employee",
     },
     department: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Department"
+      ref: "Department",
     },
     location: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Location"
-    }
+      ref: "Location",
+    },
   },
   { timestamps: true }
 );
