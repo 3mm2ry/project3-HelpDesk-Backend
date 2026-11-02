@@ -20,4 +20,13 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/", verifyToken, async (req, res) => {
+  try {
+    const allAssets = await Asset.find();
+    res.json(allAssets);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 module.exports = router;
