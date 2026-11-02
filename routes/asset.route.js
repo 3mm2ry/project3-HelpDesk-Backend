@@ -29,4 +29,24 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/:assetId", verifyToken, async (req, res) => {
+  try {
+    const foundAsset = await Asset.findById(req.params.assetId);
+    res.json(foundAsset);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.delete("/:assetId", verifyToken, async (req, res) => {
+  try {
+    if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
+      const deletedAsset = await Asset.findByIdAndDelete(req.params.assetId);
+      return res.json(deletedAsset);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 module.exports = router;
