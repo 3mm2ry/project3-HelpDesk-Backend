@@ -48,11 +48,11 @@ const assetSchema = new mongoose.Schema(
     expectedReturnDate: {
       type: Date,
     },
-    borrowStatus: {
-      type: String,
-      enum: ["Available", "Pending", "Borrowed"],
-      default: "Available",
-    },
+ borrowStatus: {
+  type: String,
+  enum: ["Available", "Pending", "Approved", "Rejected", "Borrowed", "Returned"],
+  default: "Available"
+}
   },
   { timestamps: true },
 );
