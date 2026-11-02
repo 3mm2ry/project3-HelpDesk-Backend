@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const assetSchema = new mongoose.Schema(
@@ -31,7 +32,13 @@ const assetSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Available", "Borrowed", "Under Maintenance", "Retired"],
+      enum: [
+        "Available",
+        "Assigned",
+        "Borrowed",
+        "Under Maintenance",
+        "Retired",
+      ],
       default: "Available",
     },
     assignedTo: {
@@ -48,13 +55,20 @@ const assetSchema = new mongoose.Schema(
     expectedReturnDate: {
       type: Date,
     },
- borrowStatus: {
-  type: String,
-  enum: ["Available", "Pending", "Approved", "Rejected", "Borrowed", "Returned"],
-  default: "Available"
-}
+    borrowStatus: {
+      type: String,
+      enum: [
+        "Available",
+        "Pending",
+        "Approved",
+        "Rejected",
+        "Borrowed",
+        "Returned",
+      ],
+      default: "Available",
+    },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Asset = mongoose.model("Asset", assetSchema);
