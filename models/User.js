@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Employee", "IT Staff", "Admin"],
+      enum: ["Employee", "IT-Staff", "Admin"],
       default: "Employee",
     },
     department: {
@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
       ref: "Location",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.set("toJSON", {
