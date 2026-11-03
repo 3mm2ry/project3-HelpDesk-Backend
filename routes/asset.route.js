@@ -53,7 +53,7 @@ router.delete("/:assetId", verifyToken, async (req, res) => {
   }
 });
 
-router.put("/:assetId", verifyToken, async (req, res) => {
+router.put("/:assetId/edit", verifyToken, async (req, res) => {
   try {
     if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
       const updatedAsset = await Asset.findByIdAndUpdate(

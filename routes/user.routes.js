@@ -30,7 +30,7 @@ router.get("/:userId", verifyToken, async (req, res) => {
   }
 });
 
-router.put("/:userId", verifyToken, async (req, res) => {
+router.put("/:userId/edit", verifyToken, async (req, res) => {
   try {
     if (req.user.role === "Admin") {
       const updatedUser = await User.findByIdAndUpdate(
