@@ -49,7 +49,7 @@ router.get("/:ticketId", verifyToken, async (req, res) => {
 });
 
 // Update Ticket
-router.put("/:ticketId", verifyToken, async (req, res) => {
+router.put("/:ticketId/edit", verifyToken, async (req, res) => {
   try {
     const updateTicket = await Ticket.findByIdAndUpdate(
       req.params.ticketId,
@@ -74,7 +74,7 @@ router.put("/:ticketId", verifyToken, async (req, res) => {
 });
 
 // Delete Ticket
-router.delete("/:ticketId", verifyToken, async (req, res) => {
+router.delete("/:ticketId/delete", verifyToken, async (req, res) => {
   try {
     const deleteTicket = await Ticket.findByIdAndDelete(
       req.params.ticketId
