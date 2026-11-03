@@ -17,4 +17,17 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/:userId", verifyToken, async (req, res) => {
+  try {
+    if (req.user.role === "Admin") {
+      const foundUser = await User.findById(req.params.userId)
+        .populate("department")
+        .populate("location");
+      return res.json(foundUser);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 module.exports = router;
