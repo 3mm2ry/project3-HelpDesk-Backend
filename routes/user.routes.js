@@ -1,4 +1,4 @@
-// IN USER MODEL ONLY ADMIN CAN ACCESS THE WHOLE ROUTE + ASSOSIATED ROUTES
+// IN USER MODEL ONLY ADMIN CAN ACCESS THE WHOLE ROUTE + ASSOSIATED ROUTES.
 
 const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
