@@ -45,4 +45,14 @@ router.put("/:userId", verifyToken, async (req, res) => {
   }
 });
 
+router.delete("/:userId", verifyToken, async (req, res) => {
+  try {
+    if (req.user.role === "Admin") {
+      const deletedUser = await User.findByIdAndDelete(req.params.userId);
+      return res.json(deletedUser);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 module.exports = router;
