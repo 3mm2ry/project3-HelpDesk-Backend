@@ -30,4 +30,19 @@ router.get("/:userId", verifyToken, async (req, res) => {
   }
 });
 
+router.put("/:userId", verifyToken, async (req, res) => {
+  try {
+    if (req.user.role === "Admin") {
+      const updatedUser = await User.findByIdAndUpdate(
+        req.params.userId,
+        req.body,
+        { new: true },
+      );
+      return res.json(updatedUser);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 module.exports = router;
