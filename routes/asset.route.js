@@ -130,4 +130,25 @@ router.put("/:assetId/reject", verifyToken, async (req, res) => {
   }
 });
 
+router.put("/:assetId/return", verifyToken, async (req, res) => {
+  try {
+    if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
+      const updatedAsset = await Asset.findByIdAndUpdate(
+        req.params.assetId,
+        {
+          status: "Available",
+          borrowStatus: "Available",
+          borrowedBy: null,
+          borrowDate: null,
+          expectedReturnDate: null,
+        },
+        { new: true },
+      );
+      return res.json(updatedAsset);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 module.exports = router;
