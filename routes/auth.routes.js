@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 router.post("/sign-up", async (req, res) => {
   try {
-    const { username, password, email, department, role } = req.body;
+    const { username, password, email, department } = req.body;
 
     // Validation
     if (!username || !password)
@@ -22,7 +22,6 @@ router.post("/sign-up", async (req, res) => {
       username,
       email,
       department,
-      role,
       hashedPassword: await bcrypt.hash(password, 12),
     });
 

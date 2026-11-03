@@ -27,11 +27,11 @@ app.use(morgan("dev"));
 // Routes
 app.use("/auth", authRoutes);
 app.use("/assets", assetRoutes);
-app.use("/comment", commentRoutes);
-app.use("/department", departmentRoutes);
-app.use("/location", locationRoutes);
-app.use("/user", userRoutes);
-app.use("/ticket", ticketRoutes);
+app.use("/comments", commentRoutes);
+app.use("/departments", departmentRoutes);
+app.use("/locations", locationRoutes);
+app.use("/users", userRoutes);
+app.use("/tickets", ticketRoutes);
 
 // connect to database and listen on Port 3000
 async function startServer() {
