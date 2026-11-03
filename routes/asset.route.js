@@ -55,7 +55,7 @@ router.delete("/:assetId", verifyToken, async (req, res) => {
 
 router.put("/:assetId", verifyToken, async (req, res) => {
   try {
-    if (req.user.role === "it" || req.user.role === "admin") {
+    if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
       const updatedAsset = await Asset.findByIdAndUpdate(
         req.params.assetId,
         req.body,
@@ -82,6 +82,25 @@ router.post("/:assetId/borrow", verifyToken, async (req, res) => {
           borrowStatus: "Pending",
           borrowedBy: req.user._id,
           expectedReturnDate: req.body.expectedReturnDate,
+        },
+        { new: true },
+      );
+      return res.json(updatedAsset);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.put("/:assetId/approve", verifyToken, async (req, res) => {
+  try {
+    if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
+      const updatedAsset = await Asset.findByIdAndUpdate(
+        req.params.assetId,
+        {
+          status: "Borrowed",
+          borrowStatus: "Borrowed",
+          borrowDate: new Date(),
         },
         { new: true },
       );
