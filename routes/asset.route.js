@@ -22,7 +22,9 @@ router.post("/", verifyToken, async (req, res) => {
 
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const allAssets = await Asset.find();
+    const allAssets = await Asset.find()
+      .populate("assignedTo")
+      .populate("borrowedBy");
     res.json(allAssets);
   } catch (err) {
     console.log(err);
@@ -31,7 +33,9 @@ router.get("/", verifyToken, async (req, res) => {
 
 router.get("/:assetId", verifyToken, async (req, res) => {
   try {
-    const foundAsset = await Asset.findById(req.params.assetId);
+    const foundAsset = await Asset.findById(req.params.assetId)
+      .populate("assignedTo")
+      .populate("borrowedBy");
     res.json(foundAsset);
   } catch (err) {
     console.log(err);
@@ -43,6 +47,45 @@ router.delete("/:assetId", verifyToken, async (req, res) => {
     if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
       const deletedAsset = await Asset.findByIdAndDelete(req.params.assetId);
       return res.json(deletedAsset);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.put("/:assetId", verifyToken, async (req, res) => {
+  try {
+    if (req.user.role === "it" || req.user.role === "admin") {
+      const updatedAsset = await Asset.findByIdAndUpdate(
+        req.params.assetId,
+        req.body,
+        { new: true },
+      );
+      return res.json(updatedAsset);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.post("/:assetId/borrow", verifyToken, async (req, res) => {
+  try {
+    const foundAsset = await Asset.findById(req.params.assetId);
+
+    if (
+      foundAsset.status === "Available" &&
+      foundAsset.borrowStatus === "Available"
+    ) {
+      const updatedAsset = await Asset.findByIdAndUpdate(
+        req.params.assetId,
+        {
+          borrowStatus: "Pending",
+          borrowedBy: req.user._id,
+          expectedReturnDate: req.body.expectedReturnDate,
+        },
+        { new: true },
+      );
+      return res.json(updatedAsset);
     }
   } catch (err) {
     console.log(err);
