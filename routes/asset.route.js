@@ -42,7 +42,7 @@ router.get("/:assetId", verifyToken, async (req, res) => {
   }
 });
 
-router.delete("/:assetId", verifyToken, async (req, res) => {
+router.delete("/:assetId/delete", verifyToken, async (req, res) => {
   try {
     if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
       const deletedAsset = await Asset.findByIdAndDelete(req.params.assetId);
