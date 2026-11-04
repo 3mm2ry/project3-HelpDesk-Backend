@@ -14,6 +14,10 @@ router.post("/", verifyToken, async (req, res) => {
         status: status,
       });
       return res.status(201).json(newAsset);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "You dont have the previleges to DO this..." });
     }
   } catch (err) {
     console.log(err);
@@ -47,6 +51,10 @@ router.delete("/:assetId/delete", verifyToken, async (req, res) => {
     if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
       const deletedAsset = await Asset.findByIdAndDelete(req.params.assetId);
       return res.json(deletedAsset);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "You dont have the previleges to Delete this..." });
     }
   } catch (err) {
     console.log(err);
@@ -62,6 +70,10 @@ router.put("/:assetId/edit", verifyToken, async (req, res) => {
         { new: true },
       );
       return res.json(updatedAsset);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "You dont have the previleges to edit this..." });
     }
   } catch (err) {
     console.log(err);
@@ -105,6 +117,10 @@ router.put("/:assetId/approve", verifyToken, async (req, res) => {
         { new: true },
       );
       return res.json(updatedAsset);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "You dont have the previleges to ADO this..." });
     }
   } catch (err) {
     console.log(err);
@@ -124,6 +140,10 @@ router.put("/:assetId/reject", verifyToken, async (req, res) => {
         { new: true },
       );
       return res.json(updatedAsset);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "You dont have the previleges to RDO this..." });
     }
   } catch (err) {
     console.log(err);
@@ -145,6 +165,12 @@ router.put("/:assetId/return", verifyToken, async (req, res) => {
         { new: true },
       );
       return res.json(updatedAsset);
+    } else {
+      return res
+        .status(404)
+        .json({
+          message: "You dont have the previleges to Even try and do this...",
+        });
     }
   } catch (err) {
     console.log(err);
