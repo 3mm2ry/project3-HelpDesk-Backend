@@ -16,4 +16,21 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/", verifyToken, async (req, res) => {
+  try {
+    if (req.query.ticket) {
+      const ticketComments = await Comment.find({
+        ticket: req.query.ticket,
+      }).populate("author");
+      return res.json(ticketComments);
+    } else {
+      const allComments = await Comment.find()
+        .populate("author")
+        .populate("ticket");
+      return res.json(allComments);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 module.exports = router;
