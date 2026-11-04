@@ -1,26 +1,28 @@
 const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
-const comment = require("../models/Comment");
+const Comment = require("../models/Comment");
 const ticket = require("../models/Ticket");
 
 // user should only write on his ticket
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { ticket, message } = req.body;
-    const foundTicket = await ticket.findById(ticket);
+    const { ticket: ticketId, message } = req.body;
+    const foundTicket = await ticket.findById(ticketId);
+    if (!foundTicket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
     if (
-      foundTicket.createdBy == req.user._id ||
+      foundTicket.createdBy.equals(req.user._id) ||
       req.user.role === "IT-Staff" ||
       req.user.role === "Admin"
     ) {
       const newComment = await Comment.create({
-        ticket: ticket,
+        ticket: ticketId,
         message: message,
         author: req.user._id,
       });
       return res.status(201).json(newComment);
-    } else if (!foundTicket) {
-      return res.status(404).json({ message: "Ticket not found" });
     } else {
       return res
         .status(403)
