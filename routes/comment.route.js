@@ -50,4 +50,19 @@ router.put("/:commentId", verifyToken, async (req, res) => {
     console.log(err);
   }
 });
+
+router.delete("/:commentId", verifyToken, async (req, res) => {
+  try {
+    const foundComment = await Comment.findById(req.params.commentId);
+
+    if (foundComment.author == req.user._id || req.user.role === "Admin") {
+      const deletedComment = await Comment.findByIdAndDelete(
+        req.params.commentId,
+      );
+      return res.json(deletedComment);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 module.exports = router;
