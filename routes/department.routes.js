@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
 const Department = require("../models/Department");
+const User = require("../models/User");
 
 // Create Department
 router.post("/", verifyToken, async (req, res) => {
@@ -26,8 +27,24 @@ router.get("/", verifyToken, async (req, res) => {
     const getAllDepartments = await Department.find();
 
     res.status(200).json(getAllDepartments);
-  } 
-  catch (error) {
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get Department Users (Admin Only)
+router.get("/:departmentId/users", verifyToken, async (req, res) => {
+  try {
+    if (req.user.role === "Admin") {
+      const getDepartmentUsers = await User.find({
+        department: req.params.departmentId,
+      });
+
+      res.status(200).json(getDepartmentUsers);
+    } else {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -49,14 +66,12 @@ router.put("/:departmentId/edit", verifyToken, async (req, res) => {
     } else {
       return res.status(403).json({ error: "Not authorized" });
     }
-  } 
-  catch (error) {
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-
- // Delete Department
+// Delete Department
 router.delete("/:departmentId/delete", verifyToken, async (req, res) => {
   try {
     if (req.user.role === "Admin") {
@@ -72,6 +87,5 @@ router.delete("/:departmentId/delete", verifyToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 module.exports = router;
