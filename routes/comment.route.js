@@ -33,4 +33,21 @@ router.get("/", verifyToken, async (req, res) => {
     console.log(err);
   }
 });
+
+router.put("/:commentId", verifyToken, async (req, res) => {
+  try {
+    const foundComment = await Comment.findById(req.params.commentId);
+
+    if (foundComment.author == req.user._id) {
+      const updatedComment = await Comment.findByIdAndUpdate(
+        req.params.commentId,
+        { message: req.body.message },
+        { new: true },
+      );
+      return res.json(updatedComment);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 module.exports = router;
