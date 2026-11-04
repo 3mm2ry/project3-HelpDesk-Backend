@@ -49,7 +49,7 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-router.put("/:commentId", verifyToken, async (req, res) => {
+router.put("/:commentId/edit", verifyToken, async (req, res) => {
   try {
     const foundComment = await Comment.findById(req.params.commentId);
 
@@ -60,6 +60,8 @@ router.put("/:commentId", verifyToken, async (req, res) => {
         { new: true },
       );
       return res.json(updatedComment);
+    } else {
+      return res.status(404).json({ message: "You cant edit this..." });
     }
   } catch (err) {
     console.log(err);
@@ -75,6 +77,8 @@ router.delete("/:commentId", verifyToken, async (req, res) => {
         req.params.commentId,
       );
       return res.json(deletedComment);
+    } else {
+      return res.status(404).json({ message: "You cant Delete this..." });
     }
   } catch (err) {
     console.log(err);
