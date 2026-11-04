@@ -11,6 +11,10 @@ router.get("/", verifyToken, async (req, res) => {
         .populate("department")
         .populate("location");
       return res.json(allUsers);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "You dont have the prevliges to do this..." });
     }
   } catch (err) {
     console.log(err);
@@ -24,6 +28,10 @@ router.get("/:userId", verifyToken, async (req, res) => {
         .populate("department")
         .populate("location");
       return res.json(foundUser);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "You dont have the previleges to see this..." });
     }
   } catch (err) {
     console.log(err);
@@ -39,6 +47,10 @@ router.put("/:userId/edit", verifyToken, async (req, res) => {
         { new: true },
       );
       return res.json(updatedUser);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "You dont have the previleges to edit this..." });
     }
   } catch (err) {
     console.log(err);
@@ -50,6 +62,10 @@ router.delete("/:userId", verifyToken, async (req, res) => {
     if (req.user.role === "Admin") {
       const deletedUser = await User.findByIdAndDelete(req.params.userId);
       return res.json(deletedUser);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "You dont have the previleges to DELETE this..." });
     }
   } catch (err) {
     console.log(err);
