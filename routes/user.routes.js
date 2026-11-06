@@ -3,6 +3,7 @@
 const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
 const User = require("../models/User");
+const Asset = require("../models/Assets");
 
 router.get("/", verifyToken, async (req, res) => {
   try {
@@ -88,6 +89,7 @@ router.put("/:userId/edit", verifyToken, async (req, res) => {
     }
   } catch (err) {
     console.log(err);
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -106,9 +108,10 @@ router.delete("/:userId", verifyToken, async (req, res) => {
       });
 
       if (assignedAsset || borrowedAsset) {
-        return res
-          .status(400)
-          .json({ message: "This user still has an asset, return it first" });
+        return res.status(400).json({
+          message:
+            "This user still has an asset and need to  be marked as returend first",
+        });
       }
       const deletedUser = await User.findByIdAndDelete(req.params.userId);
       if (!deletedUser) {
@@ -122,6 +125,7 @@ router.delete("/:userId", verifyToken, async (req, res) => {
     }
   } catch (err) {
     console.log(err);
+    res.status(500).json({ message: err.message });
   }
 });
 module.exports = router;
