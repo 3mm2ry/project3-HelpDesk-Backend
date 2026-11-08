@@ -12,12 +12,14 @@ router.post("/", verifyToken, async (req, res) => {
         description: req.body.description,
       });
 
-      res.status(201).json(createDepartment);
+      return res.status(201).json(createDepartment);
     } else {
-      return res.status(403).json({ error: "Not authorized" });
+      return res.status(403).json({
+        error: "Not authorized",
+      });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -26,9 +28,9 @@ router.get("/", verifyToken, async (req, res) => {
   try {
     const getAllDepartments = await Department.find();
 
-    res.status(200).json(getAllDepartments);
+    return res.status(200).json(getAllDepartments);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -40,12 +42,33 @@ router.get("/:departmentId/users", verifyToken, async (req, res) => {
         department: req.params.departmentId,
       });
 
-      res.status(200).json(getDepartmentUsers);
+      return res.status(200).json(getDepartmentUsers);
     } else {
-      return res.status(403).json({ error: "Not authorized" });
+      return res.status(403).json({
+        error: "Not authorized",
+      });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Get Department by ID
+router.get("/:departmentId", verifyToken, async (req, res) => {
+  try {
+    const getDepartmentById = await Department.findById(
+      req.params.departmentId
+    );
+
+    if (!getDepartmentById) {
+      return res.status(404).json({
+        message: "Department not found",
+      });
+    }
+
+    return res.status(200).json(getDepartmentById);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -62,12 +85,20 @@ router.put("/:departmentId/edit", verifyToken, async (req, res) => {
         { new: true }
       );
 
-      res.status(200).json(updateDepartment);
+      if (!updateDepartment) {
+        return res.status(404).json({
+          message: "Department not found",
+        });
+      }
+
+      return res.status(200).json(updateDepartment);
     } else {
-      return res.status(403).json({ error: "Not authorized" });
+      return res.status(403).json({
+        error: "Not authorized",
+      });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -79,12 +110,20 @@ router.delete("/:departmentId/delete", verifyToken, async (req, res) => {
         req.params.departmentId
       );
 
-      res.status(200).json(deleteDepartment);
+      if (!deleteDepartment) {
+        return res.status(404).json({
+          message: "Department not found",
+        });
+      }
+
+      return res.status(200).json(deleteDepartment);
     } else {
-      return res.status(403).json({ error: "Not authorized" });
+      return res.status(403).json({
+        error: "Not authorized",
+      });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 

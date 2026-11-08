@@ -17,40 +17,81 @@ router.post("/", verifyToken, async (req, res) => {
       slaDeadline: req.body.slaDeadline,
     });
 
-    res.status(201).json(createTicket);
-  } 
-  catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(201).json(createTicket);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 
 // Get All Tickets
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const getAllTickets = await Ticket.find();
+    let getAllTickets;
 
-    res.status(200).json(getAllTickets);
-  } 
-  catch (error) {
-    res.status(500).json({ error: error.message });
+    if (req.user.role === "Employee") {
+      getAllTickets = await Ticket.find({
+        createdBy: req.user._id,
+      });
+    } else {
+      getAllTickets = await Ticket.find();
+    }
+
+    return res.status(200).json(getAllTickets);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
-   
+
 // Get Ticket by ID
 router.get("/:ticketId", verifyToken, async (req, res) => {
   try {
-    const getTicketById = await Ticket.findById(req.params.ticketId);
+    const getTicketById = await Ticket.findById(
+      req.params.ticketId
+    );
 
-    res.status(200).json(getTicketById);
-  } 
-  catch (error) {
-    res.status(500).json({ error: error.message });
+    if (!getTicketById) {
+      return res.status(404).json({
+        message: "Ticket not found",
+      });
+    }
+
+    if (
+      req.user.role === "Employee" &&
+      getTicketById.createdBy.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "You cannot access this Ticket",
+      });
+    }
+
+    return res.status(200).json(getTicketById);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 
 // Update Ticket
 router.put("/:ticketId/edit", verifyToken, async (req, res) => {
   try {
+    const foundTicket = await Ticket.findById(
+      req.params.ticketId
+    );
+
+    if (!foundTicket) {
+      return res.status(404).json({
+        message: "Ticket not found",
+      });
+    }
+
+    if (
+      req.user.role === "Employee" &&
+      foundTicket.createdBy.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "You cannot update this Ticket",
+      });
+    }
+
     const updateTicket = await Ticket.findByIdAndUpdate(
       req.params.ticketId,
       {
@@ -66,24 +107,41 @@ router.put("/:ticketId/edit", verifyToken, async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json(updateTicket);
-  } 
-  catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(200).json(updateTicket);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 
 // Delete Ticket
 router.delete("/:ticketId/delete", verifyToken, async (req, res) => {
   try {
+    const foundTicket = await Ticket.findById(
+      req.params.ticketId
+    );
+
+    if (!foundTicket) {
+      return res.status(404).json({
+        message: "Ticket not found",
+      });
+    }
+
+    if (
+      req.user.role === "Employee" &&
+      foundTicket.createdBy.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "You cannot delete this Ticket",
+      });
+    }
+
     const deleteTicket = await Ticket.findByIdAndDelete(
       req.params.ticketId
     );
 
-    res.status(200).json(deleteTicket);
-  } 
-  catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(200).json(deleteTicket);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 
