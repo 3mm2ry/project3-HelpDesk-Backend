@@ -94,7 +94,7 @@ router.put("/:commentId/edit", verifyToken, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
+////// delete comment
 router.delete("/:commentId", verifyToken, async (req, res) => {
   try {
     const foundComment = await Comment.findById(req.params.commentId);
