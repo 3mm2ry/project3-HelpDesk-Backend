@@ -1,8 +1,6 @@
 const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
 const Asset = require("../models/Assets");
-
-// Added: Multer Middleware
 const upload = require("../middleware/upload");
 
 router.post("/", verifyToken, upload.array("images", 5), async (req, res) => {
@@ -16,8 +14,9 @@ router.post("/", verifyToken, upload.array("images", 5), async (req, res) => {
         serialNumber: serialNumber,
         status: status,
 
-        // Added: Save uploaded image paths
-        images: req.files.map((file) => `/uploads/${file.filename}`),
+        images: req.files
+          ? req.files.map((file) => `/uploads/${file.filename}`)
+          : [],
       });
       return res.status(201).json(newAsset);
     } else {
