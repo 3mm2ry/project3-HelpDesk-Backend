@@ -2,8 +2,11 @@ const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
 const Ticket = require("../models/Ticket");
 
+// Added: Multer Middleware
+const upload = require("../middleware/upload");
+
 // Create Ticket
-router.post("/", verifyToken, async (req, res) => {
+router.post("/", verifyToken, upload.array("images", 5), async (req, res) => {
   try {
     const createTicket = await Ticket.create({
       title: req.body.title,
@@ -15,6 +18,9 @@ router.post("/", verifyToken, async (req, res) => {
       assignedTo: req.body.assignedTo,
       contactMethod: req.body.contactMethod,
       slaDeadline: req.body.slaDeadline,
+
+      // Added: Save uploaded image paths
+      images: req.files.map((file) => `/uploads/${file.filename}`),
     });
 
     return res.status(201).json(createTicket);

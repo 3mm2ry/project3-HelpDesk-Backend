@@ -42,6 +42,12 @@ const ticketSchema = new mongoose.Schema(
     },
     slaDeadline: {
       type: Date
+    },
+
+    // Uploaded images
+    images: {
+      type: [String],
+      default: []
     }
   },
   { timestamps: true }

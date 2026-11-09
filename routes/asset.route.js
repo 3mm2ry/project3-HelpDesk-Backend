@@ -2,7 +2,10 @@ const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
 const Asset = require("../models/Assets");
 
-router.post("/", verifyToken, async (req, res) => {
+// Added: Multer Middleware
+const upload = require("../middleware/upload");
+
+router.post("/", verifyToken, upload.array("images", 5), async (req, res) => {
   try {
     if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
       const { assetTag, name, category, serialNumber, status } = req.body;
@@ -12,6 +15,9 @@ router.post("/", verifyToken, async (req, res) => {
         category: category,
         serialNumber: serialNumber,
         status: status,
+
+        // Added: Save uploaded image paths
+        images: req.files.map((file) => `/uploads/${file.filename}`),
       });
       return res.status(201).json(newAsset);
     } else {
