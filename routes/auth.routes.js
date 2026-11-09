@@ -9,13 +9,13 @@ router.post("/sign-up", async (req, res) => {
     const { username, password, email, department } = req.body;
 
     // Validation
-    if (!username || !password)
+    if (!username || !password || !email)
       return res
         .status(400)
-        .json({ message: "Username and password are required." });
+        .json({ message: "Username, email and password are required." });
     if (password.length < 6)
       return res
-        .status(400)
+        .status(400)  
         .json({ message: "Password must be more than 6 characters" });
 
     const user = await User.create({
