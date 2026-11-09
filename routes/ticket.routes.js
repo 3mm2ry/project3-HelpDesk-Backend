@@ -19,8 +19,9 @@ router.post("/", verifyToken, upload.array("images", 5), async (req, res) => {
       contactMethod: req.body.contactMethod,
       slaDeadline: req.body.slaDeadline,
 
-      // Added: Save uploaded image paths
-      images: req.files.map((file) => `/uploads/${file.filename}`),
+      images: req.files
+        ? req.files.map((file) => `/uploads/${file.filename}`)
+        : [],
     });
 
     return res.status(201).json(createTicket);
@@ -51,9 +52,7 @@ router.get("/", verifyToken, async (req, res) => {
 // Get Ticket by ID
 router.get("/:ticketId", verifyToken, async (req, res) => {
   try {
-    const getTicketById = await Ticket.findById(
-      req.params.ticketId
-    );
+    const getTicketById = await Ticket.findById(req.params.ticketId);
 
     if (!getTicketById) {
       return res.status(404).json({
@@ -79,9 +78,7 @@ router.get("/:ticketId", verifyToken, async (req, res) => {
 // Update Ticket
 router.put("/:ticketId/edit", verifyToken, async (req, res) => {
   try {
-    const foundTicket = await Ticket.findById(
-      req.params.ticketId
-    );
+    const foundTicket = await Ticket.findById(req.params.ticketId);
 
     if (!foundTicket) {
       return res.status(404).json({
@@ -110,7 +107,7 @@ router.put("/:ticketId/edit", verifyToken, async (req, res) => {
         contactMethod: req.body.contactMethod,
         slaDeadline: req.body.slaDeadline,
       },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json(updateTicket);
@@ -122,9 +119,7 @@ router.put("/:ticketId/edit", verifyToken, async (req, res) => {
 // Delete Ticket
 router.delete("/:ticketId/delete", verifyToken, async (req, res) => {
   try {
-    const foundTicket = await Ticket.findById(
-      req.params.ticketId
-    );
+    const foundTicket = await Ticket.findById(req.params.ticketId);
 
     if (!foundTicket) {
       return res.status(404).json({
@@ -141,9 +136,7 @@ router.delete("/:ticketId/delete", verifyToken, async (req, res) => {
       });
     }
 
-    const deleteTicket = await Ticket.findByIdAndDelete(
-      req.params.ticketId
-    );
+    const deleteTicket = await Ticket.findByIdAndDelete(req.params.ticketId);
 
     return res.status(200).json(deleteTicket);
   } catch (error) {
