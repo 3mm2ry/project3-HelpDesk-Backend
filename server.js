@@ -32,6 +32,7 @@ app.use("/departments", departmentRoutes);
 app.use("/locations", locationRoutes);
 app.use("/users", userRoutes);
 app.use("/tickets", ticketRoutes);
+app.use("/uploads", express.static("public/uploads"));
 
 // connect to database and listen on Port 3000
 async function startServer() {

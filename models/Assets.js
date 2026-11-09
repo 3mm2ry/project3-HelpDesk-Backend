@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const assetSchema = new mongoose.Schema(
@@ -66,6 +65,12 @@ const assetSchema = new mongoose.Schema(
         "Returned",
       ],
       default: "Available",
+    },
+
+    // Uploaded images
+    images: {
+      type: [String],
+      default: [],
     },
   },
   { timestamps: true }
