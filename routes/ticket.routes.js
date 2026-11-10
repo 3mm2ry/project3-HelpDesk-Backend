@@ -76,45 +76,55 @@ router.get("/:ticketId", verifyToken, async (req, res) => {
 });
 
 // Update Ticket
-router.put("/:ticketId/edit", verifyToken, async (req, res) => {
-  try {
-    const foundTicket = await Ticket.findById(req.params.ticketId);
+router.put(
+  "/:ticketId/edit",
+  verifyToken,
+  upload.array("images", 5),
+  async (req, res) => {
+    try {
+      const foundTicket = await Ticket.findById(req.params.ticketId);
 
-    if (!foundTicket) {
-      return res.status(404).json({
-        message: "Ticket not found",
-      });
+      if (!foundTicket) {
+        return res.status(404).json({
+          message: "Ticket not found",
+        });
+      }
+
+      if (
+        req.user.role === "Employee" &&
+        foundTicket.createdBy.toString() !== req.user._id.toString()
+      ) {
+        return res.status(403).json({
+          message: "You cannot update this Ticket",
+        });
+      }
+      let images = foundTicket.images;
+      if (req.files && req.files.length > 0) {
+        const newImages = req.files.map((file) => `/uploads/${file.filename}`);
+        images = [...foundAsset.images, ...newImages];
+      }
+      const updateTicket = await Ticket.findByIdAndUpdate(
+        req.params.ticketId,
+        {
+          title: req.body.title,
+          description: req.body.description,
+          category: req.body.category,
+          priority: req.body.priority,
+          status: req.body.status,
+          assignedTo: req.body.assignedTo,
+          contactMethod: req.body.contactMethod,
+          slaDeadline: req.body.slaDeadline,
+          images: images,
+        },
+        { new: true },
+      );
+
+      return res.status(200).json(updateTicket);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
     }
-
-    if (
-      req.user.role === "Employee" &&
-      foundTicket.createdBy.toString() !== req.user._id.toString()
-    ) {
-      return res.status(403).json({
-        message: "You cannot update this Ticket",
-      });
-    }
-
-    const updateTicket = await Ticket.findByIdAndUpdate(
-      req.params.ticketId,
-      {
-        title: req.body.title,
-        description: req.body.description,
-        category: req.body.category,
-        priority: req.body.priority,
-        status: req.body.status,
-        assignedTo: req.body.assignedTo,
-        contactMethod: req.body.contactMethod,
-        slaDeadline: req.body.slaDeadline,
-      },
-      { new: true },
-    );
-
-    return res.status(200).json(updateTicket);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
+  },
+);
 
 // Delete Ticket
 router.delete("/:ticketId/delete", verifyToken, async (req, res) => {
