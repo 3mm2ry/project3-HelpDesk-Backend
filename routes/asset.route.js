@@ -87,48 +87,62 @@ router.delete("/:assetId/delete", verifyToken, async (req, res) => {
   }
 });
 
-router.put("/:assetId/edit", verifyToken, async (req, res) => {
-  try {
-    if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
-      const foundAsset = await Asset.findById(req.params.assetId);
+router.put(
+  "/:assetId/edit",
+  verifyToken,
+  upload.array("images", 5),
+  async (req, res) => {
+    try {
+      if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
+        const foundAsset = await Asset.findById(req.params.assetId);
 
-      if (!foundAsset) {
-        return res.status(404).json({ message: "Asset not found" });
-      }
+        if (!foundAsset) {
+          return res.status(404).json({ message: "Asset not found" });
+        }
 
-      if (
-        foundAsset.borrowStatus === "Pending" ||
-        foundAsset.borrowStatus === "Borrowed"
-      ) {
+        if (
+          foundAsset.borrowStatus === "Pending" ||
+          foundAsset.borrowStatus === "Borrowed"
+        ) {
+          return res
+            .status(404)
+            .json({ message: "You cant edit an asset while it is borrowed" });
+        }
+        const { assetTag, name, category, serialNumber, status, assignedTo } =
+          req.body;
+        let images = foundAsset.images;
+        if (req.files && req.files.length > 0) {
+          const newImages = req.files.map(
+            (file) => `/uploads/${file.filename}`,
+          );
+          images = [...foundAsset.images, ...newImages];
+        }
+
+        const updatedAsset = await Asset.findByIdAndUpdate(
+          req.params.assetId,
+          {
+            assetTag: assetTag,
+            name: name,
+            category: category,
+            serialNumber: serialNumber,
+            status: status,
+            assignedTo: assignedTo,
+            images: images,
+          },
+          { new: true, runValidators: true },
+        );
+        return res.json(updatedAsset);
+      } else {
         return res
           .status(404)
-          .json({ message: "You cant edit an asset while it is borrowed" });
+          .json({ message: "You dont have the previleges to edit this..." });
       }
-      const { assetTag, name, category, serialNumber, status, assignedTo } =
-        req.body;
-      const updatedAsset = await Asset.findByIdAndUpdate(
-        req.params.assetId,
-        {
-          assetTag: assetTag,
-          name: name,
-          category: category,
-          serialNumber: serialNumber,
-          status: status,
-          assignedTo: assignedTo,
-        },
-        { new: true, runValidators: true },
-      );
-      return res.json(updatedAsset);
-    } else {
-      return res
-        .status(404)
-        .json({ message: "You dont have the previleges to edit this..." });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: err.message });
     }
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: err.message });
-  }
-});
+  },
+);
 
 router.post("/:assetId/borrow", verifyToken, async (req, res) => {
   try {
