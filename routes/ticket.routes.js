@@ -72,6 +72,9 @@ router.get("/:ticketId", verifyToken, async (req, res) => {
       });
     }
 
+    // load the creator details (phone number) after the owner check above
+    await getTicketById.populate("createdBy");
+
     return res.status(200).json(getTicketById);
   } catch (error) {
     return res.status(500).json({ error: error.message });
