@@ -106,6 +106,14 @@ router.put(
         const newImages = req.files.map((file) => `/uploads/${file.filename}`);
         images = [...foundTicket.images, ...newImages];
       }
+
+      let status = foundTicket.status;
+      if (
+        (req.user.role === "Admin" || req.user.role === "IT-Staff") &&
+        req.body.status
+      ) {
+        status = req.body.status;
+      }
       const updateTicket = await Ticket.findByIdAndUpdate(
         req.params.ticketId,
         {
@@ -113,7 +121,7 @@ router.put(
           description: req.body.description,
           category: req.body.category,
           priority: req.body.priority,
-          status: req.body.status,
+          status: status,
           assignedTo: req.body.assignedTo,
           contactMethod: req.body.contactMethod,
           slaDeadline: req.body.slaDeadline,
