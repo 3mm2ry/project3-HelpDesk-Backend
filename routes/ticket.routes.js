@@ -101,7 +101,7 @@ router.put(
       let images = foundTicket.images;
       if (req.files && req.files.length > 0) {
         const newImages = req.files.map((file) => `/uploads/${file.filename}`);
-        images = [...foundAsset.images, ...newImages];
+        images = [...foundTicket.images, ...newImages];
       }
       const updateTicket = await Ticket.findByIdAndUpdate(
         req.params.ticketId,
