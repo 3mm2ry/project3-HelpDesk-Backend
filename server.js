@@ -14,6 +14,7 @@ const departmentRoutes = require("./routes/department.routes.js");
 const locationRoutes = require("./routes/location.routes.js");
 const userRoutes = require("./routes/user.routes.js");
 const ticketRoutes = require("./routes/ticket.routes.js");
+const aiRoutes = require("./routes/ai.routes.js");
 
 // Middleware
 app.use(
@@ -32,6 +33,7 @@ app.use("/departments", departmentRoutes);
 app.use("/locations", locationRoutes);
 app.use("/users", userRoutes);
 app.use("/tickets", ticketRoutes);
+app.use("/ai", aiRoutes);
 app.use("/uploads", express.static("public/uploads"));
 
 // connect to database and listen on Port 3000

@@ -38,9 +38,12 @@ router.get("/", verifyToken, async (req, res) => {
     if (req.user.role === "Employee") {
       getAllTickets = await Ticket.find({
         createdBy: req.user._id,
-      });
+      }).populate({ path: "createdBy", populate: { path: "location" } });
     } else {
-      getAllTickets = await Ticket.find();
+      getAllTickets = await Ticket.find().populate({
+        path: "createdBy",
+        populate: { path: "location" },
+      });
     }
 
     return res.status(200).json(getAllTickets);

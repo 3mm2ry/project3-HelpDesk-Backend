@@ -3,32 +3,51 @@ const verifyToken = require("../middleware/verifyToken");
 const Asset = require("../models/Assets");
 const upload = require("../middleware/upload");
 
-router.post("/", verifyToken, upload.array("images", 5), async (req, res) => {
-  try {
-    if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
-      const { assetTag, name, category, serialNumber, status } = req.body;
-      const newAsset = await Asset.create({
-        assetTag: assetTag,
-        name: name,
-        category: category,
-        serialNumber: serialNumber,
-        status: status,
+//the post now after take the req.body from the employee somehow and upload then it show the error
 
-        images: req.files
-          ? req.files.map((file) => `/uploads/${file.filename}`)
-          : [],
-      });
-      return res.status(201).json(newAsset);
-    } else {
-      return res
-        .status(403)
-        .json({ message: "You dont have the previleges to DO this..." });
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: err.message });
+function isStaff(req, res, next) {
+  // will fix it
+  if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
+    next();
+  } else {
+    return res
+      .status(403)
+      .json({ message: "You dont have the previleges to DO this..." });
   }
-});
+}
+
+router.post(
+  "/",
+  verifyToken,
+  isStaff,
+  upload.array("images", 5),
+  async (req, res) => {
+    try {
+      if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
+        const { assetTag, name, category, serialNumber, status } = req.body;
+        const newAsset = await Asset.create({
+          assetTag: assetTag,
+          name: name,
+          category: category,
+          serialNumber: serialNumber,
+          status: status,
+
+          images: req.files
+            ? req.files.map((file) => `/uploads/${file.filename}`)
+            : [],
+        });
+        return res.status(201).json(newAsset);
+      } else {
+        return res
+          .status(403)
+          .json({ message: "You dont have the previleges to DO this..." });
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: err.message });
+    }
+  },
+);
 
 router.get("/", verifyToken, async (req, res) => {
   try {
@@ -58,7 +77,7 @@ router.get("/:assetId", verifyToken, async (req, res) => {
   }
 });
 
-router.delete("/:assetId/delete", verifyToken, async (req, res) => {
+router.delete("/:assetId/delete", verifyToken, isStaff, async (req, res) => {
   try {
     if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
       const foundAsset = await Asset.findById(req.params.assetId);
@@ -90,6 +109,7 @@ router.delete("/:assetId/delete", verifyToken, async (req, res) => {
 router.put(
   "/:assetId/edit",
   verifyToken,
+  isStaff,
   upload.array("images", 5),
   async (req, res) => {
     try {
@@ -165,6 +185,8 @@ router.post("/:assetId/borrow", verifyToken, async (req, res) => {
         { new: true },
       );
       return res.json(updatedAsset);
+    } else {
+      return res.status(400).json({ message: "NOT AVAILABLE" });
     }
   } catch (err) {
     console.log(err);
@@ -205,9 +227,18 @@ router.put("/:assetId/cancel", verifyToken, async (req, res) => {
   }
 });
 
-router.put("/:assetId/approve", verifyToken, async (req, res) => {
+router.put("/:assetId/approve", verifyToken, isStaff, async (req, res) => {
   try {
     if (req.user.role === "IT-Staff" || req.user.role === "Admin") {
+      const foundAsset = await Asset.findById(req.params.assetId);
+
+      if (!foundAsset) {
+        return res.status(404).json({ message: "Asset not found" });
+      }
+
+      if (foundAsset.borrowStatus !== "Pending") {
+        return res.status(400).json({ message: " no pending request" });
+      }
       const updatedAsset = await Asset.findByIdAndUpdate(
         req.params.assetId,
         {
@@ -236,6 +267,9 @@ router.put("/:assetId/reject", verifyToken, async (req, res) => {
 
       if (!foundAsset) {
         return res.status(404).json({ message: "Asset not found" });
+      }
+      if (foundAsset.borrowStatus !== "Pending") {
+        return res.status(400).json({ message: " no pending request" });
       }
 
       const updatedAsset = await Asset.findByIdAndUpdate(
@@ -268,6 +302,9 @@ router.put("/:assetId/return", verifyToken, async (req, res) => {
         return res.status(404).json({ message: "Asset not found" });
       }
 
+      if (foundAsset.borrowStatus !== "Borrowed") {
+        return res.status(400).json({ message: " not borrowed" });
+      }
       const updatedAsset = await Asset.findByIdAndUpdate(
         req.params.assetId,
         {
@@ -287,6 +324,7 @@ router.put("/:assetId/return", verifyToken, async (req, res) => {
     }
   } catch (err) {
     console.log(err);
+    res.status(500).json({ message: err.message });
   }
 });
 

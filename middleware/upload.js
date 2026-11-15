@@ -10,11 +10,13 @@ const storage = multer.diskStorage({
 
     cb(null, uniqueSuffix + path.extname(file.originalname));
   },
+});
+
+const upload = multer({
+  storage: storage,
   limits: {
     fileSize: 5 * 1024 * 1024, // this equate to 5MB and NOT 5GB
   },
 });
-
-const upload = multer({ storage });
 
 module.exports = upload;
