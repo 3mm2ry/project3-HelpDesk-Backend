@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -19,6 +20,10 @@ const userSchema = new mongoose.Schema(
     hashedPassword: {
       type: String,
       required: true,
+    },
+    phoneNumber: {
+      type: String,
+      trim: true,
     },
     role: {
       type: String,

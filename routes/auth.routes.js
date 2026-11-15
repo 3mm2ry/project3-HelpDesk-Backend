@@ -1,3 +1,4 @@
+
 const router = require("express").Router();
 
 const bcrypt = require("bcrypt");
@@ -6,22 +7,24 @@ const jwt = require("jsonwebtoken");
 
 router.post("/sign-up", async (req, res) => {
   try {
-    const { username, password, email, department } = req.body;
+    const { username, password, email, department, phoneNumber } = req.body;
 
     // Validation
-    if (!username || !password || !email)
+    if (!username || !password || !email || !phoneNumber)
       return res
         .status(400)
-        .json({ message: "Username, email and password are required." });
+        .json({ message: "Username, email, password and phone number are required." });
+
     if (password.length < 6)
       return res
-        .status(400)  
+        .status(400)
         .json({ message: "Password must be more than 6 characters" });
 
     const user = await User.create({
       username,
       email,
       department,
+      phoneNumber,
       hashedPassword: await bcrypt.hash(password, 12),
     });
 
@@ -29,14 +32,22 @@ router.post("/sign-up", async (req, res) => {
 
     res
       .status(201)
-      .json({ username: user.username, _id, createdAt, updatedAt });
+      .json({
+        username: user.username,
+        phoneNumber: user.phoneNumber,
+        _id,
+        createdAt,
+        updatedAt
+      });
   } catch (err) {
     console.log(err);
+
     if (err.name === "ValidationError") {
       return res.status(400).json({
         message: err.message,
       });
     }
+
     if (err.code === 11000) {
       return res.status(409).json({
         message: "Username already exists",
@@ -44,6 +55,7 @@ router.post("/sign-up", async (req, res) => {
     }
 
     console.log(err);
+
     return res.status(500).json({
       message: "Internal Server Error",
     });
@@ -59,9 +71,11 @@ router.post("/sign-in", async (req, res) => {
         message: "Username and password are required.",
       });
     }
+
     const user = await User.findOne({
       username: username.toLowerCase().trim(),
     });
+
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials." });
     }
@@ -70,6 +84,7 @@ router.post("/sign-in", async (req, res) => {
       password,
       user.hashedPassword,
     );
+
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Invalid credentials." });
     }
@@ -80,6 +95,7 @@ router.post("/sign-in", async (req, res) => {
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
+
     return res.status(200).json({
       accessToken,
       user: {
